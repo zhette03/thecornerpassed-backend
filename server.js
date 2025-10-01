@@ -170,86 +170,85 @@ app.post('/api/rsvp', async (req, res) => {
     });
     console.log('✅ Successfully wrote to Google Sheet');
 
-    //Send confirmation email if email provided
-    if (email && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-      try {
-        console.log('📧 Sending confirmation email to:', email);
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'TCP LIVE-STOCK RSVP Confirmation',
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <style>
-                body { 
-                  font-family: Arial, sans-serif; 
-                  margin: 0;
-                  padding: 0;
-                  background-color: #f5f5f5;
-                }
-                .container { 
-                  max-width: 600px; 
-                  margin: 40px auto; 
-                  padding: 40px;
-                  background-color: white;
-                  border: 1px solid #000;
-                }
-                .number { 
-                  font-size: 72px; 
-                  font-weight: bold; 
-                  text-align: center; 
-                  margin: 30px 0;
-                  letter-spacing: 5px;
-                }
-                .details { 
-                  font-size: 16px; 
-                  line-height: 1.8;
-                }
-                .details p {
-                  margin: 10px 0;
-                }
-                .header {
-                  text-align: center;
-                  font-size: 24px;
-                  font-weight: bold;
-                  margin-bottom: 20px;
-                }
-                .footer {
-                  margin-top: 30px;
-                  padding-top: 20px;
-                  border-top: 1px solid #000;
-                  font-size: 14px;
-                  text-align: center;
-                }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">RSVP CONFIRMED</div>
-                <div class="number">${formattedNumber}</div>
-                <div class="details">
-                  <p><strong>Name:</strong> ${name}</p>
-                  <p><strong>Time:</strong> ${time}</p>
-                  <p><strong>Event:</strong> TCP LIVE-STOCK Spring Summer 26</p>
-                  <p><strong>Date:</strong> October 11th, 2025</p>
-                  <p><strong>Location:</strong> 45 W 29th St, New York, NY</p>
-                </div>
-                <div class="footer">
-                  Please save this confirmation email for your records.
-                </div>
-              </div>
-            </body>
-            </html>
-          `,
-        });
-        console.log('✅ Email sent successfully');
-      } catch (emailError) {
-        console.error('⚠️ Email send failed:', emailError.message);
-        // Don't fail the request if email fails
-      }
-    }
+// Send confirmation email if email provided (don't wait for it)
+if (email && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  console.log('📧 Sending confirmation email to:', email);
+  // Don't await - let it send in background
+  transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'TCP LIVE-STOCK RSVP Confirmation',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+          }
+          .container { 
+            max-width: 600px; 
+            margin: 40px auto; 
+            padding: 40px;
+            background-color: white;
+            border: 1px solid #000;
+          }
+          .number { 
+            font-size: 72px; 
+            font-weight: bold; 
+            text-align: center; 
+            margin: 30px 0;
+            letter-spacing: 5px;
+          }
+          .details { 
+            font-size: 16px; 
+            line-height: 1.8;
+          }
+          .details p {
+            margin: 10px 0;
+          }
+          .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+          }
+          .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #000;
+            font-size: 14px;
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">RSVP CONFIRMED</div>
+          <div class="number">${formattedNumber}</div>
+          <div class="details">
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Time:</strong> ${time}</p>
+            <p><strong>Event:</strong> TCP LIVE-STOCK Spring Summer 26</p>
+            <p><strong>Date:</strong> October 11th, 2025</p>
+            <p><strong>Location:</strong> 45 W 29th St, New York, NY</p>
+          </div>
+          <div class="footer">
+            Please save this confirmation email for your records.
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  }).then(() => {
+    console.log('✅ Email sent successfully');
+  }).catch(emailError => {
+    console.error('⚠️ Email send failed:', emailError.message);
+  });
+}
 
     // Success response
     console.log('🎉 RSVP completed successfully');
