@@ -41,7 +41,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Constants
-const MAX_SLOTS = 2;
+const MAX_SLOTS = 45;
 
 // Helper: Get current counts for both time slots
 async function getTimeCounts() {
